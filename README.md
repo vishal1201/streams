@@ -29,14 +29,18 @@ class Employee {
     }
 }
 
-Employee[] employees = {
-    new Employee(1, "Mickey Mouse", 100000.0),
-    new Employee(2, "Donald Duck", 200000.0),
-    new Employee(3, "Goofy Goo", 300000.0)
-};
+class Main {
+    public static void main(String[] args) {
+        Employee[] employees = {
+                new Employee(1, "Mickey Mouse", 100000.0),
+                new Employee(2, "Donald Duck", 200000.0),
+                new Employee(3, "Goofy Goo", 300000.0)
+        };
 
-Employee brotherBear = new Employee(4, "Brother Bear", 5000.0);
-Employee mufasa = new Employee(5, "Mufasa - The Lion King", 500000.0);
+        Employee brotherBear = new Employee(4, "Brother Bear", 5000.0);
+        Employee mufasa = new Employee(5, "Mufasa - The Lion King", 500000.0);
+    }
+}
 ```
 ---
 
