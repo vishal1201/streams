@@ -45,7 +45,7 @@ class Main {
 ---
 
 ## Java Streams Creation
-Following are some snippets to help create streams.
+##### Following are some snippets to help create streams.
 <br></br>
 
 #### Stream of Employees from an existing array
@@ -78,10 +78,19 @@ Stream<Employee> employeeStream = builder.build();
 ---
 
 ## Java Streams Operations
-Following are some snippets of available operations on Java Streams and their usages.
+There are two types of stream operations - **intermediate** & **terminal**.
+
+##### Terminal
+> An operation that marks the stream as consumed. And ends the stream operation
+> 
+##### Intermediate
+> An operation that returns a new stream after performing the supplied operation on input stream
+
+##### Following are some snippets of available operations on Java Streams and their usages.
 <br></br>
 
 #### forEach
+###### Operation Type: Terminal
 Loop over stream element and call the supplied function over each. `forEach()` is a terminal operation, i.e. once `forEach()`
 is called, the stream is considered to be consumed.
 
@@ -96,6 +105,7 @@ empList.stream().forEach(e -> e.incrementSalary(10.0));
 
 
 #### map
+###### Operation Type: Intermediate
 `map()` applies the supplied function to each element of the current stream
 and returns a new stream. The resultant stream can be of the same or different type.
 
@@ -111,6 +121,7 @@ Stream<Integer> squared = Stream.of(1, 2, 3, 4, 5).map(x -> x * x);
 ```
 
 #### collect
+###### Operation Type: Terminal
 Once all the stream processing is done, we can use the `collect()`
 with a suitable collector option.
 We saw in the previous example how we used collect with toList collector
@@ -118,6 +129,7 @@ to collect stream of `double salary` into the `List<Double> salaries`.
 The strategy for collection is provided via the `Collector` interface.
 
 #### filter
+###### Operation Type: Intermediate
 `filter()` as the name suggests, helps filter a given stream. It does so,
 by passing the elements of input stream via a Predicate, that
 evaluates to either `true / false` based on a condition on the element.
@@ -130,6 +142,7 @@ List<Employee> employeesWithSalariesUnder200K = empList.stream()
 ```
 
 #### findFirst
+###### Operation Type: Terminal
 `findFirst()` returns an Optional for the first entry in the stream; the Optional can, of course, be empty.
 
 ```java
@@ -137,6 +150,7 @@ Optional<Employee> employee = empList.stream().findFirst();
 ```
 
 #### toArray
+###### Operation Type: Terminal
 `collect()` is used to collect the stream into a Collection. If we need to get an array out of the stream, we can simply use `toArray()`.
 
 ```java
@@ -144,6 +158,7 @@ Employee[] employees = empList.stream().toArray(Employee[]::new);
 ```
 
 #### flatMap
+###### Operation Type: Intermediate
 `flatMap()` helps us flatten a complex stream such as below. We have a `List<List<Stream>>>`;
 flatMap would help us flatten it to a `Stream<String>` which can be collected into a `List<String>`.
 `map()` takes one input, generates one output. `flatMap()` takes one input and generates
@@ -161,6 +176,7 @@ List<String> employees = couples.stream()
 ```
 
 #### peek
+###### Operation Type: Intermediate
 `peek()` is an intermediate operation that helps perform a function
 over each element of a stream.
 
