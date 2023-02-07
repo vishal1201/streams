@@ -190,3 +190,39 @@ over each element of a stream.
 
 ---
 
+
+## Method Types and Pipelines
+In the last section we saw different stream operations and available methods 
+to use them. Some methods are terminal(_returns non-stream types_) which marks the stream as consumed
+some are intermediate(_returns streams_), output of which can be further processed.
+
+> A stream pipeline consists of a stream source, followed by zero or more intermediate operations,
+> and a terminal operation.
+
+**Here's a short example**
+Here we are using a `stream()` that is passed to `filter()`, that intern
+returns a filtered-stream, which is forwarded to `collect()`. Here, `stream(), filter()`,
+are intermediate operations, and `collect()` is a terminal operation.
+
+```java
+List<Employee> employeesWithSalariesUnder200K = empList.stream()
+                .filter(e -> e.getSalary() < 200000)
+                .collect(Collectors.toList());
+```
+
+Some operations are called **short-circuiting operations**.
+**Short-circuiting** operations allow computations on infinite streams to complete in finite time.
+Here, `Stream<T> iterate(final T seed, final UnaryOperator<T> f)` will generate an infinite
+stream starting with 0, with next elements incremented by 1 more than current.
+the `skip()` short-circuit operation is used to skip the first `n` elements in the input stream.
+if `stream().count()` < `n`, then an empty stream is generated. here we skip the first 5 elements.
+That gives us a stream of numbers starting from 5, incremented by 1. `limit()` helps to limit the stream up to 10.
+i.e. a stream from 5 to 14.
+
+```java
+ Stream.iterate(0, n -> n + 1)
+    .skip(5)
+    .limit(10)
+    .forEach(System.out::println);
+```
+
