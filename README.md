@@ -1,7 +1,7 @@
-# Java Streams
+#java #java8 #streams
 My take on learning Java Streams by doing.
 Trying to collate all helpful snippets for future reference.
-Feel free to use/fork/share. 
+Feel free to use/fork/share.
 
 ---
 
@@ -46,7 +46,6 @@ class Main {
 
 ## Java Streams Creation
 **Following are some snippets to help create streams.**
-<br></br>
 
 #### Stream of Employees from an existing array
 ```java
@@ -82,12 +81,12 @@ There are two types of stream operations - **intermediate** & **terminal**.
 
 ##### Terminal
 > An operation that marks the stream as consumed. And ends the stream operation
-> 
+>
 ##### Intermediate
 > An operation that returns a new stream after performing the supplied operation on input stream
 
 **Following are some snippets of available operations on Java Streams and their usages.**
-<br></br>
+
 
 #### forEach
 _Operation Type: Terminal_
@@ -101,7 +100,7 @@ empList.stream().forEach(e -> e.incrementSalary(10.0));
 ```
 
 > **_NOTE:_**  Stream can be consumed only once. If attempted to consume after being consumed, the following exception is thrown
-> 
+>
 > **IllegalStateException: stream has already been operated upon or closed.**
 
 
@@ -192,7 +191,8 @@ over each element of a stream.
 
 
 ## Method Types and Pipelines
-In the last section we saw different stream operations and available methods 
+
+In the last section we saw different stream operations and available methods
 to use them. Some methods are terminal(_returns non-stream types_) which marks the stream as consumed
 some are intermediate(_returns streams_), output of which can be further processed.
 
@@ -226,3 +226,75 @@ i.e. a stream from 5 to 14.
     .forEach(System.out::println);
 ```
 
+  
+---  
+
+## Lazy Evaluation
+
+One thing that significantly improves Java streams is the ability to evaluate   
+operations lazily.
+It is not until the terminal operation is triggered, the source data is computed. Consumption happens only as needed.   All intermediate operations are lazy, i.e. not executed until a result of a processing is actually needed.
+
+```java
+Employee employee = Stream.of(employees)
+  .filter(e -> e != null)
+  .filter(e -> e.getSalary() > 100000)
+  .findFirst()
+  .orElse(null);
+```
+
+Here, all the operations are performed on first employee from the array. Since the first employee has salary less than 200000, it proceeds to run the operations on the second object. this object satisfies the first and second `filter()` calls. Hence, the third operation `findFirst()` is evaluated, and Employee object is returned. No operations are performed on the third object.
+
+Lazy Evaluation avoids examination of the data that’s not necessary. This behaviour becomes even more important when the input stream is infinite and not just very large.
+
+---
+
+## Comparison Based Stream Operations
+
+#### sorted
+`sorted()` sorts the input stream based on the comparator passed inside it.
+
+```java
+empList.stream()
+      .sorted((e1, e2) -> e1.getSalary() > e2.getSalary())
+      .collect(Collectors.toList());
+```
+
+Here we sorted the `empList` by the employee salaries.
+> **_NOTE:_**  short-circuit operations will not be applied for sorted(). Even if we had used findFirst(), it would have first sorted the array. Because without that, one would not know which would be the first sorted element.
+
+#### min and max
+As the name suggests, these are used to get the maximum or minimum element from a stream based on a comparator. The return is wrapped in an Optional since either of these could be absent in the stream.
+
+```java
+Employee highestSalariedEmployee = empList.stream()
+      .max(Comparator.comparing(Employee::getSalary))
+      .orElseThrow(NoSuchElementException::new);
+
+Employee lowestSalariedEmployee = empList.stream()
+      .min(Comparator.comparing(Employee::getSalary))
+      .orElseThrow(NoSuchElementException::new);
+```
+
+#### distinct
+Removes duplicates from the input stream by using the `equals()` method of the stream elements to conclude whether two elements are same or not.
+
+```java
+Stream.of(1, 3, 5, 2, 2, 8, 3).distinct().collect(Collectors.toList());
+```
+
+#### allMatch, anyMatch, and noneMatch
+
+All of these operations take a `Predicate` and return a `boolean`. Short-circuiting is applied and processing is stopped as soon as the answer is determined
+
+```java
+boolean allEven = intList.stream().allMatch(i -> i % 2 == 0);
+boolean oneEven = intList.stream().anyMatch(i -> i % 2 == 0);
+boolean noneMultipleOfThree = intList.stream().noneMatch(i -> i % 3 == 0);
+```
+
+`allMatch()`checks if the `Predicate` is `true` for all the elements in the stream. Here, it returns`false`as soon as it encounters 5, which is not divisible by 2.
+
+`anyMatch()`checks if the `Predicate` is `true` for any one element in the stream. Here, again short-circuiting is applied and `true`is returned immediately after the first element.
+
+`noneMatch()`checks if there are no elements matching the `Predicate`. Here, it simply returns `false`as soon as it encounters 6, which is divisible by 3.
