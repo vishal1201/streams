@@ -226,7 +226,6 @@ i.e. a stream from 5 to 14.
     .forEach(System.out::println);
 ```
 
-  
 ---  
 
 ## Lazy Evaluation
@@ -298,3 +297,23 @@ boolean noneMultipleOfThree = intList.stream().noneMatch(i -> i % 3 == 0);
 `anyMatch()`checks if the `Predicate` is `true` for any one element in the stream. Here, again short-circuiting is applied and `true`is returned immediately after the first element.
 
 `noneMatch()`checks if there are no elements matching the `Predicate`. Here, it simply returns `false`as soon as it encounters 6, which is divisible by 3.
+
+---
+
+## Java Stream Specialisations
+So far we have dealt with object streams. But there exist streams to work with the primitive data types - IntStream, DoubleStream, LongStream. These are super helpful while we are dealing with a numerical operations.
+These do not extend Stream interface, but rather extend BaseStream interface, which is being extended by Stream. So many of the stream operations available via Stream interface are not present in these streams.
+
+#### Creation
+The most common way of creating an`IntStream`is to call`mapToInt()`on an existing stream
+
+```java
+Double latestEmpId = empList.stream()
+      .mapToDouble(Employee::getSalary)
+      .max()
+      .orElseThrow(NoSuchElementException::new);
+```
+
+Here, we start with a`Stream<Employee>`and get an`IntStream`by supplying the`Employee::getId`to_mapToDouble_. Finally, we call_max()_which returns the highest integer.
+
+We can also use`IntStream.of()`for creating the`IntStream` :
