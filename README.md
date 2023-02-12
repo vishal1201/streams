@@ -301,11 +301,12 @@ boolean noneMultipleOfThree = intList.stream().noneMatch(i -> i % 3 == 0);
 ---
 
 ## Java Stream Specialisations
-So far we have dealt with object streams. But there exist streams to work with the primitive data types - IntStream, DoubleStream, LongStream. These are super helpful while we are dealing with a numerical operations.
-These do not extend Stream interface, but rather extend BaseStream interface, which is being extended by Stream. So many of the stream operations available via Stream interface are not present in these streams.
+
+So far we have dealt with object streams. But, there exist streams to work with the primitive data types - `IntStream`, `DoubleStream`, `LongStream`. These are super helpful while we are dealing with a numerical operations.
+These do not extend `Stream` interface, but rather extend `BaseStream` interface, which is being extended by `Stream`. So many of the stream operations available via `Stream` interface are not present in these streams.
 
 #### Creation
-The most common way of creating an`IntStream`is to call`mapToInt()`on an existing stream
+The most common way of creating an `IntStream` is to call `mapToInt()` on an existing stream
 
 ```java
 Double latestEmpId = empList.stream()
@@ -314,6 +315,74 @@ Double latestEmpId = empList.stream()
       .orElseThrow(NoSuchElementException::new);
 ```
 
-Here, we start with a`Stream<Employee>`and get an`IntStream`by supplying the`Employee::getId`to_mapToDouble_. Finally, we call_max()_which returns the highest integer.
+Here, we start with a `Stream<Employee>` and get an `IntStream` by supplying the `Employee::getId` to _mapToDouble_. Finally, we call _max()_ which returns the highest integer.
 
-We can also use`IntStream.of()`for creating the`IntStream` :
+We can also use `IntStream.of()` for creating the `IntStream`:
+
+```java
+IntStream stream = IntStream.of(1, 2, 3, 4, 5);.
+```
+
+or `IntStream.range()`:
+
+```java
+IntStream.range(1, 10);
+```
+which creates an IntStream from 1 to 9.
+
+```java
+Stream<Integer> streamOfInt = Stream.of(1, 2, 3, 4, 5);
+```
+
+Above statement returns us a `Stream<Integer>` and not an `IntStream`. One has to be heedful as to which operation returns which type of stream. Similarly, `Stream.map(Employee::id)` returns a `Stream<Integer>`, but if we do this - `Stream.mapToInt(Employee:id)`, that yields us an `IntStream`.
+
+#### Specialised Operations
+
+Specialised streams provide some additional operations that make dealing with numbers quite effortless.
+
+For example - `average()`, `range()`, `sum()`
+
+```java
+Double averageSalary = empList.stream().mapToDouble(Employee::getSalary).average().orElseThrow(NoSuchElementException::new);
+```
+
+---
+
+## Reduction Operations
+
+A **reduction** is the process of combining a stream into a summarised result by applying a combination operation. We already saw few reduction operations like `findFirst()`,  `min()` and  `max()`.
+
+#### reduce()
+Let's see the general purpose `reduce()` operation.
+The most common form of `reduce()` is:
+
+```java
+T reduce(T identity, BinaryOperator<T> accumulator)
+```
+
+where identity is the initial value and accumulator is the repeating binary operation.
+
+For example, sum of all salaries -
+
+```java
+Double totalSalaries = empList.stream()
+      .map(Employee::getSalary)
+      .reduce(0.0, Double::sum);
+```
+
+---
+
+## Advanced collect
+
+We already saw how we used `Collectors.toList()` to get the list out of the stream. Let’s now see few more ways to collect elements from the stream.
+
+#### joining
+
+```java
+String empNames = empList.stream()  
+        .map(Employee::getName)  
+        .collect(Collectors.joining(", "))  
+        .toString();
+```
+
+`Collectors.joining()`  helps join 2 strings by putting a delimiter between by internally using `java.util.StringJoiner`.tream`:
