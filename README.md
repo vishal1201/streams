@@ -1,4 +1,3 @@
-#java #java8 #streams
 My take on learning Java Streams by doing.
 Trying to collate all helpful snippets for future reference.
 Feel free to use/fork/share.
@@ -226,6 +225,7 @@ i.e. a stream from 5 to 14.
     .forEach(System.out::println);
 ```
 
+  
 ---  
 
 ## Lazy Evaluation
@@ -306,7 +306,7 @@ So far we have dealt with object streams. But, there exist streams to work with 
 These do not extend `Stream` interface, but rather extend `BaseStream` interface, which is being extended by `Stream`. So many of the stream operations available via `Stream` interface are not present in these streams.
 
 #### Creation
-The most common way of creating an `IntStream` is to call `mapToInt()` on an existing stream
+The most common way of creating an`IntStream`is to call`mapToInt()`on an existing stream
 
 ```java
 Double latestEmpId = empList.stream()
@@ -315,9 +315,9 @@ Double latestEmpId = empList.stream()
       .orElseThrow(NoSuchElementException::new);
 ```
 
-Here, we start with a `Stream<Employee>` and get an `IntStream` by supplying the `Employee::getId` to _mapToDouble_. Finally, we call _max()_ which returns the highest integer.
+Here, we start with a`Stream<Employee>`and get an`IntStream`by supplying the`Employee::getId`to_mapToDouble_. Finally, we call_max()_which returns the highest integer.
 
-We can also use `IntStream.of()` for creating the `IntStream`:
+We can also use`IntStream.of()`for creating the`IntStream`:
 
 ```java
 IntStream stream = IntStream.of(1, 2, 3, 4, 5);.
@@ -350,11 +350,11 @@ Double averageSalary = empList.stream().mapToDouble(Employee::getSalary).average
 
 ## Reduction Operations
 
-A **reduction** is the process of combining a stream into a summarised result by applying a combination operation. We already saw few reduction operations like `findFirst()`,  `min()` and  `max()`.
+A **reduction** is the process of combining a stream into a summarised result by applying a combination operation.We already saw few reduction operations like`findFirst()`, `min()` and `max()`.
 
 #### reduce()
 Let's see the general purpose `reduce()` operation.
-The most common form of `reduce()` is:
+The most common form of`reduce()`is:
 
 ```java
 T reduce(T identity, BinaryOperator<T> accumulator)
@@ -374,7 +374,7 @@ Double totalSalaries = empList.stream()
 
 ## Advanced collect
 
-We already saw how we used `Collectors.toList()` to get the list out of the stream. Let’s now see few more ways to collect elements from the stream.
+We already saw how we used`Collectors.toList()`to get the list out of the stream. Let’s now see few more ways to collect elements from the stream.
 
 #### joining
 
@@ -385,4 +385,86 @@ String empNames = empList.stream()
         .toString();
 ```
 
-`Collectors.joining()`  helps join 2 strings by putting a delimiter between by internally using `java.util.StringJoiner`.tream`:
+`Collectors.joining()`  helps join 2 strings by putting a delimiter between by internally using `java.util.StringJoiner`.
+
+#### toSet
+
+We can also use`toSet()`to get a set out of stream elements:
+
+```java
+@Test
+public void whenCollectBySet_thenGetSet() {
+    Set<String> empNames = empList.stream()
+            .map(Employee::getName)
+            .collect(Collectors.toSet());
+    
+    assertEquals(empNames.size(), 3);
+}
+```
+
+#### toCollection
+
+We can use`Collectors.toCollection()`to extract the elements into any other collection by passing in a`Supplier<Collection>`. We can also use a constructor reference for the`Supplier`:
+
+```java
+ Vector<String> empNames = empList.stream()
+            .map(Employee::getName)
+            .collect(Collectors.toCollection(Vector::new));
+```
+
+Here, an empty collection is created internally, and its`add()` method is called on each element of the stream.
+
+#### summarizingDouble
+
+If summarised statistics is a requirement that is to be built from a stream, `summarizingDouble()`is the collector. It applies a double-producing mapping function to each input element and returns a special class containing statistical information for the resulting values -
+
+```java
+DoubleSummaryStatistics stats = empList.stream()
+	.collect(Collectors.summarizingDouble(Employee::getSalary));
+
+Integer count = stats.getCount();
+Double sum = stats.getSum();
+Double max = stats.getMax();
+Double min = stats.getMin();
+Double avg = stats.getAverage();
+```
+
+The `DoubleSummaryStatistics` objects gets us statistics like – *count, sum min, max, average, etc* .
+
+`summaryStatistics()`can be used to generate similar result when we’re using one of the specialised streams -
+
+```java
+DoubleSummaryStatistics stats = empList.stream()
+  .mapToDouble(Employee::getSalary)
+  .summaryStatistics();
+```
+
+#### partitioningBy
+
+We can partition a stream into two – based on whether the elements satisfy certain criteria or not.
+
+Let’s split our List of numerical data, into Even and Odds:
+
+```java
+Map<Boolean, List<Integer>> mapOfEvenOdd = Stream.of(2, 4, 5, 6, 8).collect(
+  Collectors.partitioningBy(i -> i % 2 == 0));
+
+assertEquals(mapOfEvenOdd.get(true).size(), 4); // 4 even numbers
+assertEquals(mapOfEvenOdd.get(false).size(), 1);  // 1 odd number
+```
+
+Here, the stream is partitioned into a Map, with evens and odds stored as `true` and `false` keys.
+
+#### groupingBy
+
+`groupingBy()`is kind of an extension of `partitioningBy()`. It partitions the stream into more than two groups.
+It takes a classification function as its parameter. This classification function is applied to each element of the stream.
+
+The value returned by the function is used as a key to the map that we get from the`groupingBy()`collector -
+
+```java
+Map<Character, List<Employee>> groupByAlphabet = empList.stream().collect(
+  Collectors.groupingBy(e -> new Character(e.getName().charAt(0))));
+```
+
+Here, we grouped the employees based on the initial character of their first name.
