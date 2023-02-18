@@ -468,3 +468,33 @@ Map<Character, List<Employee>> groupByAlphabet = empList.stream().collect(
 ```
 
 Here, we grouped the employees based on the initial character of their first name.
+
+#### mapping
+
+In the above example, we saw how we can use `groupingBy()` to group elements of the stream with the use of a `Map`. And we were able to group `Employee` objects using the first character in their first names. What if we wanted to Map the first characters of their first names, with something other then `Employee` objects? Like mapping first character of first-name with `Employee` IDs. That's what we can achieve with `mapping()` -
+
+```java
+Map<Character, List<Integer>> idsGroupedByFirstChar = empList.stream().collect(
+      Collectors.groupingBy(e -> new Character(e.getName().charAt(0)),
+        Collectors.mapping(Employee::getId, Collectors.toList())));
+```
+
+#### reducing
+
+`reducing()`is similar to`reduce()`– which we explored before. It simply returns a collector which performs a reduction of its input elements  -
+
+```java
+Double percentage = 10.0;
+Double salIncrOverhead = empList.stream().collect(Collectors.reducing(
+    0.0, e -> e.getSalary() * percentage / 100, (s1, s2) -> s1 + s2));
+```
+
+Here, by `reducing()`, we are incrementing each Employee's salary by 10% and then collecting all the increments. The overall operation is broken down into multiple pieces - Identity, Mapper, BinaryOperator. Here, 0.0 is identity (*initial value*), `e -> e.getSalary() * percentage / 100` is the mapper piece. BinaryOperator is the addition expression - ` (s1, s2) -> s1 + s2))`.
+
+---
+
+## Parallel Streams
+
+Parallel streamshelps us execute code in parallel on separate processor cores. The final result is the combination of each individual outcome.
+
+`empList.stream().parallel().forEach(e -> e.salaryIncrement(10.0));`
