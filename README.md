@@ -497,4 +497,41 @@ Here, by `reducing()`, we are incrementing each Employee's salary by 10% and the
 
 Parallel streamshelps us execute code in parallel on separate processor cores. The final result is the combination of each individual outcome.
 
-`empList.stream().parallel().forEach(e -> e.salaryIncrement(10.0));`
+`empList.stream().parallel().forEach(e -> e.incrementSalary(10.0));`
+
+Here, incrementSalary would get executed on multiple elements in parallel.
+As in the case with writing multi-threaded code, one needs to be aware of a couple things while using `paralle()`
+1. Code is to be thread-safe. Special care is to be taken if operations performed access shared data.
+2. If order is of importance, parallel streams should be avoided. Result after each run would differ.
+
+---
+
+## Infinite Streams
+
+At times, we might need a continuous stream of elements while still performing operations. Knowing the range of elements pre-hand might not be possible unlike `List` or `Map` where elements are pre-populated. We have Infinite Streams for such cases; also known as unbounded streams.
+
+Two ways to generate infinite streams -
+
+#### generate
+
+Provide a `Supplier` which gets called anytime we need new stream elements to be generated.
+
+```java
+Stream.generate(Math::random)
+      .limit(5)
+      .forEach(System.out::println);
+```
+
+With infinite streams, we need to provide an eventual termination condition. Here, we used `limit()`; it limits the stream to 5 random numbers, generated with the Supplier - `Math.random()`
+
+#### iterate
+
+`iterate()`takes two parameters - an initial value, called seed element and a function which generates next element using the previous value.`iterate()`, by design, is stateful and hence may not be useful in parallel streams -
+
+```java
+List<Integer> firstFiveMultiplesOfTwo = Stream.iterate(2,  i -> i * 2)
+  .limit(5)
+  .collect(Collectors.toList());
+```
+
+Here, 2 is the seed value, and the following expression is the lambda for consecutive iterations. The value 2 is passed to it, which  generated 4, which continues till the total elements, including seed value amounts to 5.
